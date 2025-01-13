@@ -16,21 +16,32 @@
 import os
 import sys
 
+from ament_index_python.packages import get_package_prefix
+
 from launch import LaunchDescription
 from launch import LaunchService
 from launch.actions import ExecuteProcess
+from launch.actions import LogInfo
 from launch_ros.actions import Node
 from launch_testing.legacy import LaunchTestService
 
 
 def generate_launch_description():
+    tmux_gdb_prefix = (
+        "tmux split-window "
+        + get_package_prefix("nav2_bringup")
+        + "/lib/nav2_bringup/gdb_tmux_splitwindow.sh"
+    )
+    logme = LogInfo(msg=f"tmux_gdb_prefix={tmux_gdb_prefix}")
     return LaunchDescription(
         [
+            logme,
             Node(
                 package='nav2_lifecycle_manager',
                 executable='lifecycle_manager',
                 name='lifecycle_manager_test',
                 output='screen',
+                prefix=tmux_gdb_prefix,
                 parameters=[
                     {'use_sim_time': False},
                     {'autostart': False},
@@ -44,10 +55,10 @@ def generate_launch_description():
 def main(argv=sys.argv[1:]):
     ld = generate_launch_description()
 
-    testExecutable = os.getenv('TEST_EXECUTABLE')
+    testExecutable = os.getenv('TEST_EXECUTABLE') or "TEST_EXECUTABLE_not_specified"
 
     test1_action = ExecuteProcess(
-        cmd=[testExecutable], name='test_bond_gtest', output='screen'
+        cmd=[testExecutable], name='test_bond_gtest', output='screen',
     )
 
     lts = LaunchTestService()

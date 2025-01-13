@@ -20,6 +20,11 @@ ament_add_test(test_lifecycle
 ament_add_gtest_executable(test_bond_gtest
   test_bond.cpp
 )
+target_compile_options(test_bond_gtest PUBLIC
+    -fsanitize=address -fsanitize-recover=address)
+target_link_options(test_bond_gtest PUBLIC
+    -fsanitize=address -fsanitize-recover=address)
+#export ASAN_OPTIONS=new_delete_type_mismatch=0
 target_link_libraries(test_bond_gtest
   ${library_name}
   nav2_util::nav2_util_core
