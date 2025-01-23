@@ -37,6 +37,11 @@ add_executable(lifecycle_bringup
 )
 target_link_libraries(lifecycle_bringup PRIVATE ${library_name} rclcpp::rclcpp)
 
+add_executable(lifecycle_shutdown
+  lifecycle_shutdown_commandline.cpp
+)
+target_link_libraries(lifecycle_shutdown PRIVATE ${library_name} rclcpp::rclcpp)
+
 add_executable(base_footprint_publisher
   base_footprint_publisher.cpp
 )
@@ -52,5 +57,6 @@ install(TARGETS
 
 install(TARGETS
   lifecycle_bringup
+  lifecycle_shutdown
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
