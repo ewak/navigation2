@@ -107,7 +107,7 @@ public:
    * @brief A constructor
    */
   explicit BaseFootprintPublisher(rclcpp::NodeOptions options = rclcpp::NodeOptions())
-  : Node("base_footprint_publisher", options.use_intra_process_comms(false))
+  : Node("base_footprint_publisher", options.use_intra_process_comms(true))
   {
     RCLCPP_INFO(get_logger(), "Creating base footprint publisher");
     tf_buffer_ = std::make_shared<tf2_ros::Buffer>(get_clock());
