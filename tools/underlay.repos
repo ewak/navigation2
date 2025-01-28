@@ -11,10 +11,6 @@ repositories:
   #   type: git
   #   url: https://github.com/ros-perception/vision_opencv.git
   #   version: rolling
-  ros2/rclcpp:
-    type: git
-    url: https://github.com/ewak/rclcpp.git
-    version: feature/mw/memory_safe_subscription_callback
   ros/bond_core:
     type: git
     url: https://github.com/ewak/bond_core.git
