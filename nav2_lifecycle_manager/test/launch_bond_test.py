@@ -41,7 +41,7 @@ def generate_launch_description():
                 executable='lifecycle_manager',
                 name='lifecycle_manager_test',
                 output='screen',
-                prefix=tmux_gdb_prefix,
+                #prefix=tmux_gdb_prefix,
                 parameters=[
                     {'use_sim_time': False},
                     {'autostart': False},

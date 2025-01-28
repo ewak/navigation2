@@ -40,6 +40,10 @@ target_link_libraries(${library_name} PRIVATE
   ${lifecycle_msgs_TARGETS}
   rclcpp_components::component
 )
+target_compile_options(${library_name} PUBLIC
+    -fsanitize=address -fsanitize-recover=address)
+target_link_options(${library_name} PUBLIC
+    -fsanitize=address -fsanitize-recover=address)
 
 add_executable(lifecycle_manager
   src/main.cpp
@@ -53,6 +57,11 @@ target_link_libraries(lifecycle_manager PRIVATE
   ${library_name}
   rclcpp::rclcpp
 )
+target_compile_options(lifecycle_manager PUBLIC
+    -fsanitize=address -fsanitize-recover=address)
+target_link_options(lifecycle_manager PUBLIC
+    -fsanitize=address -fsanitize-recover=address)
+#export ASAN_OPTIONS=new_delete_type_mismatch=0
 
 rclcpp_components_register_nodes(${library_name} "nav2_lifecycle_manager::LifecycleManager")
 

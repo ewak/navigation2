@@ -15,9 +15,11 @@
 import os
 
 from ament_index_python.packages import get_package_share_directory
+from ament_index_python.packages import get_package_prefix
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, GroupAction, SetEnvironmentVariable
+from launch.actions import LogInfo
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import LoadComposableNodes, SetParameter
@@ -121,6 +123,12 @@ def generate_launch_description():
         'log_level', default_value='info', description='log level'
     )
 
+    tmux_gdb_prefix = (
+        "tmux split-window "
+        + get_package_prefix("nav2_bringup")
+        + "/lib/nav2_bringup/gdb_tmux_splitwindow.sh"
+    )
+    logme = LogInfo(msg=f"tmux_gdb_prefix={tmux_gdb_prefix}")
     load_nodes = GroupAction(
         condition=IfCondition(PythonExpression(['not ', use_composition])),
         actions=[
@@ -229,6 +237,7 @@ def generate_launch_description():
                 executable='lifecycle_manager',
                 name='lifecycle_manager_navigation',
                 output='screen',
+                #prefix=tmux_gdb_prefix,
                 arguments=['--ros-args', '--log-level', log_level],
                 parameters=[{'autostart': autostart}, {'node_names': lifecycle_nodes}],
             ),

@@ -10,12 +10,15 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 echo $@
 
 #export ROS_DOMAIN_ID=0
-#export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 #export CYCLONEDDS_URI=
 #export GZ_VERSION=harmonic
 #User specific env setup like
 #/opt/aos/skel/.devenv/zenoh_humble.sh
 
+export ASAN_OPTIONS=new_delete_type_mismatch=0
+
+source /opt/ros/rolling/setup.bash
 source ${SCRIPT_DIR}/../../../setup.bash
 
 #Use -q to disable banner on startup and avoid pager
