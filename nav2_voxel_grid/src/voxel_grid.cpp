@@ -55,13 +55,9 @@ VoxelGrid::VoxelGrid(unsigned int size_x, unsigned int size_y, unsigned int size
     size_z_ = 16;
   }
 
-  data_ = new uint32_t[size_x_ * size_y_];
   uint32_t unknown_col = ~((uint32_t)0) >> 16;
-  uint32_t * col = data_;
-  for (unsigned int i = 0; i < size_x_ * size_y_; ++i) {
-    *col = unknown_col;
-    ++col;
-  }
+  data_.reserve(size_x_ * size_y_);
+  data_.assign(size_x_ * size_y_, unknown_col);
 }
 
 void VoxelGrid::resize(unsigned int size_x, unsigned int size_y, unsigned int size_z)
@@ -72,7 +68,7 @@ void VoxelGrid::resize(unsigned int size_x, unsigned int size_y, unsigned int si
     return;
   }
 
-  delete[] data_;
+  // delete[] data_;
   size_x_ = size_x;
   size_y_ = size_y;
   size_z_ = size_z;
@@ -84,28 +80,19 @@ void VoxelGrid::resize(unsigned int size_x, unsigned int size_y, unsigned int si
     size_z_ = 16;
   }
 
-  data_ = new uint32_t[size_x_ * size_y_];
   uint32_t unknown_col = ~((uint32_t)0) >> 16;
-  uint32_t * col = data_;
-  for (unsigned int i = 0; i < size_x_ * size_y_; ++i) {
-    *col = unknown_col;
-    ++col;
-  }
+  data_.reserve(size_x_ * size_y_);
+  data_.assign(size_x_ * size_y_, unknown_col);
 }
 
 VoxelGrid::~VoxelGrid()
 {
-  delete[] data_;
 }
 
 void VoxelGrid::reset()
 {
   uint32_t unknown_col = ~((uint32_t)0) >> 16;
-  uint32_t * col = data_;
-  for (unsigned int i = 0; i < size_x_ * size_y_; ++i) {
-    *col = unknown_col;
-    ++col;
-  }
+  data_.assign(size_x_ * size_y_, unknown_col);
 }
 
 void VoxelGrid::markVoxelLine(
@@ -147,12 +134,12 @@ void VoxelGrid::clearVoxelLine(
 }
 
 void VoxelGrid::clearVoxelLineInMap(
-  double x0, double y0, double z0, double x1, double y1, double z1, unsigned char * map_2d,
+  double x0, double y0, double z0, double x1, double y1, double z1, std::vector<unsigned char>& map_2d,
   unsigned int unknown_threshold, unsigned int mark_threshold, unsigned char free_cost,
   unsigned char unknown_cost, unsigned int max_length, unsigned int min_length)
 {
   costmap = map_2d;
-  if (map_2d == NULL) {
+  if (map_2d.empty()) {
     clearVoxelLine(x0, y0, z0, x1, y1, z1, max_length, min_length);
     return;
   }

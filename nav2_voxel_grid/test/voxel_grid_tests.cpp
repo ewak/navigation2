@@ -162,7 +162,7 @@ TEST(voxel_grid, clearVoxelLineInMap) {
   vg.markVoxelInMap(0, 0, 5, 0);
   EXPECT_EQ(vg.getVoxel(0, 0, 5), nav2_voxel_grid::MARKED);
 
-  unsigned char * map_2d = new unsigned char[100];
+  std::vector<unsigned char> map_2d(100);
   map_2d[0] = 254;
 
   vg.clearVoxelLineInMap(0, 0, 0, 0, 0, 9, map_2d, 16, 0);
@@ -170,19 +170,18 @@ TEST(voxel_grid, clearVoxelLineInMap) {
   EXPECT_EQ(map_2d[0], 0);
 
   vg.markVoxelInMap(0, 0, 5, 0);
-  vg.clearVoxelLineInMap(0, 0, 0, 0, 0, 9, nullptr, 16, 0);
+  std::vector<unsigned char> empty_map_2d;
+  vg.clearVoxelLineInMap(0, 0, 0, 0, 0, 9, empty_map_2d, 16, 0);
   EXPECT_EQ(vg.getVoxel(0, 0, 5), nav2_voxel_grid::FREE);
 
   // Testing for min range for raytrace clearing
   vg.markVoxelInMap(0, 0, 5, 0);
   vg.markVoxelInMap(0, 0, 7, 0);
   vg.clearVoxelLineInMap(
-    0, 0, 0, 0, 0, 9, nullptr, 16, 0, (unsigned char)'\000',
+    0, 0, 0, 0, 0, 9, empty_map_2d, 16, 0, (unsigned char)'\000',
     (unsigned char)'\377', UINT_MAX, 6);
   EXPECT_EQ(vg.getVoxel(0, 0, 5), nav2_voxel_grid::MARKED);
   EXPECT_EQ(vg.getVoxel(0, 0, 7), nav2_voxel_grid::FREE);
-
-  delete[] map_2d;
 }
 
 TEST(voxel_grid, GetVoxelData) {

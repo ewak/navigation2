@@ -390,15 +390,16 @@ protected:
    */
   template<typename data_type>
   void copyMapRegion(
-    data_type * source_map, unsigned int sm_lower_left_x,
+    const std::vector<data_type> & source_map, unsigned int sm_lower_left_x,
     unsigned int sm_lower_left_y,
-    unsigned int sm_size_x, data_type * dest_map, unsigned int dm_lower_left_x,
+    unsigned int sm_size_x, std::vector<data_type> & dest_map, unsigned int dm_lower_left_x,
     unsigned int dm_lower_left_y, unsigned int dm_size_x, unsigned int region_size_x,
     unsigned int region_size_y)
   {
     // we'll first need to compute the starting points for each map
-    data_type * sm_index = source_map + (sm_lower_left_y * sm_size_x + sm_lower_left_x);
-    data_type * dm_index = dest_map + (dm_lower_left_y * dm_size_x + dm_lower_left_x);
+    const data_type * sm_index = source_map.data() +
+      (sm_lower_left_y * sm_size_x + sm_lower_left_x);
+    data_type * dm_index = dest_map.data() + (dm_lower_left_y * dm_size_x + dm_lower_left_x);
 
     // now, we'll copy the source map into the destination map
     for (unsigned int i = 0; i < region_size_y; ++i) {
@@ -532,14 +533,14 @@ protected:
   double resolution_;
   double origin_x_;
   double origin_y_;
-  unsigned char * costmap_;
+  std::vector<unsigned char> costmap_;
   unsigned char default_value_;
 
   // *INDENT-OFF* Uncrustify doesn't handle indented public/private labels
   class MarkCell
   {
   public:
-    MarkCell(unsigned char * costmap, unsigned char value)
+    MarkCell(std::vector<unsigned char>& costmap, unsigned char value)
     : costmap_(costmap), value_(value)
     {
     }
@@ -549,7 +550,7 @@ protected:
     }
 
   private:
-    unsigned char * costmap_;
+    std::vector<unsigned char>& costmap_;
     unsigned char value_;
   };
 
@@ -557,7 +558,7 @@ protected:
   {
   public:
     PolygonOutlineCells(
-      const Costmap2D & costmap, const unsigned char * /*char_map*/,
+      const Costmap2D & costmap, const std::vector<unsigned char>& /*char_map*/,
       std::vector<MapLocation> & cells)
     : costmap_(costmap), cells_(cells)
     {

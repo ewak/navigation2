@@ -175,7 +175,7 @@ void CostmapLayer::updateWithTrueOverwrite(
     return;
   }
 
-  if (costmap_ == nullptr) {
+  if (costmap_.empty()) {
     throw std::runtime_error("Can't update costmap layer: It has't been initialized yet!");
   }
 

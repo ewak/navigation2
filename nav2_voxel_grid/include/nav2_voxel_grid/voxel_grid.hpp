@@ -86,7 +86,7 @@ public:
   void resize(unsigned int size_x, unsigned int size_y, unsigned int size_z);
 
   void reset();
-  uint32_t * getData() {return data_;}
+  std::vector<uint32_t>& getData() {return data_;}
 
   inline void markVoxel(unsigned int x, unsigned int y, unsigned int z)
   {
@@ -204,7 +204,7 @@ public:
     double x0, double y0, double z0, double x1, double y1, double z1,
     unsigned int max_length = UINT_MAX, unsigned int min_length = 0);
   void clearVoxelLineInMap(
-    double x0, double y0, double z0, double x1, double y1, double z1, unsigned char * map_2d,
+    double x0, double y0, double z0, double x1, double y1, double z1, std::vector<unsigned char>& map_2d,
     unsigned int unknown_threshold, unsigned int mark_threshold,
     unsigned char free_cost = 0, unsigned char unknown_cost = 255,
     unsigned int max_length = UINT_MAX, unsigned int min_length = 0);
@@ -338,8 +338,8 @@ private:
   }
 
   unsigned int size_x_, size_y_, size_z_;
-  uint32_t * data_;
-  unsigned char * costmap;
+  std::vector<uint32_t> data_;
+  std::vector<unsigned char> costmap;
   rclcpp::Logger logger;
 
   // Aren't functors so much fun... used to recreate the Bresenham macro Eric
@@ -347,7 +347,7 @@ private:
   class MarkVoxel
   {
 public:
-    explicit MarkVoxel(uint32_t * data)
+    explicit MarkVoxel(std::vector<uint32_t>& data)
     : data_(data) {}
     inline void operator()(unsigned int offset, unsigned int z_mask)
     {
@@ -355,13 +355,13 @@ public:
     }
 
 private:
-    uint32_t * data_;
+    std::vector<uint32_t>& data_;
   };
 
   class ClearVoxel
   {
 public:
-    explicit ClearVoxel(uint32_t * data)
+    explicit ClearVoxel(std::vector<uint32_t>& data)
     : data_(data) {}
     inline void operator()(unsigned int offset, unsigned int z_mask)
     {
@@ -369,14 +369,14 @@ public:
     }
 
 private:
-    uint32_t * data_;
+    std::vector<uint32_t>& data_;
   };
 
   class ClearVoxelInMap
   {
 public:
     ClearVoxelInMap(
-      uint32_t * data, unsigned char * costmap,
+      std::vector<uint32_t>& data, std::vector<unsigned char>& costmap,
       unsigned int unknown_clear_threshold, unsigned int marked_clear_threshold,
       unsigned char free_cost = 0, unsigned char unknown_cost = 255)
     : data_(data), costmap_(costmap),
@@ -418,8 +418,8 @@ private:
       return true;
     }
 
-    uint32_t * data_;
-    unsigned char * costmap_;
+    std::vector<uint32_t>& data_;
+    std::vector<unsigned char>& costmap_;
     unsigned int unknown_clear_threshold_, marked_clear_threshold_;
     unsigned char free_cost_, unknown_cost_;
   };

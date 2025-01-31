@@ -73,7 +73,7 @@ public:
    */
   ObstacleLayer()
   {
-    costmap_ = NULL;  // this is the unsigned char* member of parent class Costmap2D.
+    costmap_.clear(); // this is the std::vector<unsigned char> member of parent class Costmap2D.
   }
 
   /**

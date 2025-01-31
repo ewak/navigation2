@@ -70,7 +70,7 @@ public:
   VoxelLayer()
   : voxel_grid_(0, 0, 0)
   {
-    costmap_ = NULL;  // this is the unsigned char* member of parent class's parent class Costmap2D
+    costmap_.clear();  // this is the std::vector<unsigned char> member of parent class's parent class Costmap2D
   }
 
   /**

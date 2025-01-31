@@ -244,7 +244,7 @@ void VoxelLayer::updateBounds(
     grid_msg->size_y = voxel_grid_.sizeY();
     grid_msg->size_z = voxel_grid_.sizeZ();
     grid_msg->data.resize(size);
-    memcpy(&grid_msg->data[0], voxel_grid_.getData(), size * sizeof(unsigned int));
+    grid_msg->data = voxel_grid_.getData();
 
     grid_msg->origin.x = origin_x_;
     grid_msg->origin.y = origin_y_;
@@ -442,9 +442,8 @@ void VoxelLayer::updateOrigin(double new_origin_x, double new_origin_y)
   unsigned int cell_size_y = upper_right_y - lower_left_y;
 
   // we need a map to store the obstacles in the window temporarily
-  unsigned char * local_map = new unsigned char[cell_size_x * cell_size_y];
-  unsigned int * local_voxel_map = new unsigned int[cell_size_x * cell_size_y];
-  unsigned int * voxel_map = voxel_grid_.getData();
+  std::vector<unsigned char> local_map(cell_size_x * cell_size_y);
+  std::vector<unsigned int> local_voxel_map(cell_size_x * cell_size_y);
 
   // copy the local window in the costmap to the local map
   copyMapRegion(
@@ -452,7 +451,7 @@ void VoxelLayer::updateOrigin(double new_origin_x, double new_origin_y)
     cell_size_x,
     cell_size_y);
   copyMapRegion(
-    voxel_map, lower_left_x, lower_left_y, size_x_, local_voxel_map, 0, 0, cell_size_x,
+    voxel_grid_.getData(), lower_left_x, lower_left_y, size_x_, local_voxel_map, 0, 0, cell_size_x,
     cell_size_x,
     cell_size_y);
 
@@ -472,13 +471,13 @@ void VoxelLayer::updateOrigin(double new_origin_x, double new_origin_y)
     local_map, 0, 0, cell_size_x, costmap_, start_x, start_y, size_x_, cell_size_x,
     cell_size_y);
   copyMapRegion(
-    local_voxel_map, 0, 0, cell_size_x, voxel_map, start_x, start_y, size_x_,
+    local_voxel_map, 0, 0, cell_size_x, voxel_grid_.getData(), start_x, start_y, size_x_,
     cell_size_x,
     cell_size_y);
 
   // make sure to clean up
-  delete[] local_map;
-  delete[] local_voxel_map;
+  local_map.clear();
+  local_voxel_map.clear();
 }
 
 /**

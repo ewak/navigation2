@@ -39,7 +39,7 @@
 class TestVoxel
 {
 public:
-  explicit TestVoxel(uint32_t * data, int sz_x, int sz_y)
+  explicit TestVoxel(std::vector<uint32_t>& data, int sz_x, int sz_y)
   : data_(data)
   {
     size_ = sz_x * sz_y;
@@ -55,7 +55,7 @@ public:
   }
 
 private:
-  uint32_t * data_;
+  std::vector<uint32_t>& data_;
   unsigned int size_;
 };
 

@@ -50,7 +50,7 @@ Costmap2D::Costmap2D(
   unsigned int cells_size_x, unsigned int cells_size_y, double resolution,
   double origin_x, double origin_y, unsigned char default_value)
 : resolution_(resolution), origin_x_(origin_x),
-  origin_y_(origin_y), costmap_(NULL), default_value_(default_value)
+  origin_y_(origin_y), costmap_(), default_value_(default_value)
 {
   access_ = new mutex_t();
 
@@ -72,7 +72,7 @@ Costmap2D::Costmap2D(const nav_msgs::msg::OccupancyGrid & map)
   origin_y_ = map.info.origin.position.y;
 
   // create the costmap
-  costmap_ = new unsigned char[size_x_ * size_y_];
+  costmap_.reserve(size_x_ * size_y_);
 
   // fill the costmap with a data
   int8_t data;
@@ -94,17 +94,16 @@ void Costmap2D::deleteMaps()
 {
   // clean up data
   std::unique_lock<mutex_t> lock(*access_);
-  delete[] costmap_;
-  costmap_ = NULL;
+  costmap_.clear();
 }
 
 void Costmap2D::initMaps(unsigned int size_x, unsigned int size_y)
 {
   std::unique_lock<mutex_t> lock(*access_);
-  delete[] costmap_;
   size_x_ = size_x;
   size_y_ = size_y;
-  costmap_ = new unsigned char[size_x * size_y];
+  costmap_.reserve(size_x_ * size_y_);
+  costmap_.assign(size_x_ * size_y_, default_value_);
 }
 
 void Costmap2D::resizeMap(
@@ -124,7 +123,7 @@ void Costmap2D::resizeMap(
 void Costmap2D::resetMaps()
 {
   std::unique_lock<mutex_t> lock(*access_);
-  memset(costmap_, default_value_, size_x_ * size_y_ * sizeof(unsigned char));
+  costmap_.assign(size_x_ * size_y_, default_value_);
 }
 
 void Costmap2D::resetMap(unsigned int x0, unsigned int y0, unsigned int xn, unsigned int yn)
@@ -138,7 +137,7 @@ void Costmap2D::resetMapToValue(
   std::unique_lock<mutex_t> lock(*(access_));
   unsigned int len = xn - x0;
   for (unsigned int y = y0 * size_x_ + x0; y < yn * size_x_ + x0; y += size_x_) {
-    memset(costmap_ + y, value, len * sizeof(unsigned char));
+    memset(costmap_.data() + y, value, len * sizeof(unsigned char));
   }
 }
 
@@ -225,13 +224,13 @@ Costmap2D & Costmap2D::operator=(const Costmap2D & map)
   initMaps(size_x_, size_y_);
 
   // copy the cost map
-  memcpy(costmap_, map.costmap_, size_x_ * size_y_ * sizeof(unsigned char));
+  costmap_ = map.costmap_;
 
   return *this;
 }
 
 Costmap2D::Costmap2D(const Costmap2D & map)
-: costmap_(NULL)
+: costmap_()
 {
   access_ = new mutex_t();
   *this = map;
@@ -239,7 +238,7 @@ Costmap2D::Costmap2D(const Costmap2D & map)
 
 // just initialize everything to NULL by default
 Costmap2D::Costmap2D()
-: size_x_(0), size_y_(0), resolution_(0.0), origin_x_(0.0), origin_y_(0.0), costmap_(NULL)
+: size_x_(0), size_y_(0), resolution_(0.0), origin_x_(0.0), origin_y_(0.0), costmap_()
 {
   access_ = new mutex_t();
 }
@@ -258,11 +257,13 @@ unsigned int Costmap2D::cellDistance(double world_dist)
 
 unsigned char * Costmap2D::getCharMap() const
 {
-  return costmap_;
+  return (unsigned char *)costmap_.data();
 }
 
 unsigned char Costmap2D::getCost(unsigned int mx, unsigned int my) const
 {
+  // Use of at bounds checking is slower but can be helpful in debug mode.
+  // return costmap_.at(getIndex(mx, my));
   return costmap_[getIndex(mx, my)];
 }
 
@@ -368,7 +369,7 @@ void Costmap2D::updateOrigin(double new_origin_x, double new_origin_y)
   unsigned int cell_size_y = upper_right_y - lower_left_y;
 
   // we need a map to store the obstacles in the window temporarily
-  unsigned char * local_map = new unsigned char[cell_size_x * cell_size_y];
+  std::vector<unsigned char> local_map(cell_size_x * cell_size_y);
 
   // copy the local window in the costmap to the local map
   copyMapRegion(
@@ -393,7 +394,7 @@ void Costmap2D::updateOrigin(double new_origin_x, double new_origin_y)
     cell_size_y);
 
   // make sure to clean up
-  delete[] local_map;
+  local_map.clear();
 }
 
 bool Costmap2D::setConvexPolygonCost(

@@ -74,7 +74,7 @@ public:
 
   unsigned char * getCostmap()
   {
-    return costmap_;
+    return (unsigned char *)costmap_.data();
   }
 
   unsigned int getSize()
