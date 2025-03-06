@@ -262,6 +262,14 @@
       <output_port name="pose">Stamped extracted pose</output_port>
     </Action>
 
+    <Action ID="DummyBehavior">
+      <input_port name="command">Command</input_port>
+      <input_port name="server_name">Server name</input_port>
+      <input_port name="server_timeout">Server timeout</input_port>
+      <output_port name="error_code_id">DummyBehavior error code</output_port>
+      <output_port name="error_msg">DummyBehavior error message</output_port>
+    </Action>
+
     <!-- ############################### CONDITION NODES ############################## -->
     <Condition ID="GoalReached">
       <input_port name="goal">Destination</input_port>

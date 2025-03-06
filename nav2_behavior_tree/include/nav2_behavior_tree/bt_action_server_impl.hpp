@@ -108,7 +108,7 @@ BtActionServer<ActionT>::BtActionServer(
         logger_, "error_code_name_prefixes parameters were not set. Using default values of:"
           << error_code_name_prefixes_str + "\n"
           << "Make sure these match your BT and there are not other sources of error codes you"
-          "reported to your application");
+          " reported to your application");
       rclcpp::Parameter error_code_name_prefixes_param("error_code_name_prefixes",
         error_code_name_prefixes);
       node->set_parameter(error_code_name_prefixes_param);
